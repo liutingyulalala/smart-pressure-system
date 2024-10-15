@@ -7,10 +7,10 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+// import componentsRouter from './modules/components'
+// import chartsRouter from './modules/charts'
+// import tableRouter from './modules/table'
+// import nestedRouter from './modules/nested'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -71,6 +71,57 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/documentation',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/documentation/index'),
+        name: 'Documentation',
+        meta: { title: '推理过程', icon: 'documentation', affix: false }
+      }
+    ]
+  },
+  {
+    path: '/excel',
+    component: Layout,
+    redirect: '/excel/upload-excel',
+    name: 'Excel',
+    meta: {
+      // title: 'Excel',
+      icon: 'excel'
+    },
+    children: [
+      {
+        path: 'export-excel',
+        hidden: true,
+        component: () => import('@/views/excel/export-excel'),
+        name: 'ExportExcel',
+        meta: { title: 'Export Excel' }
+      },
+      {
+        path: 'export-selected-excel',
+        hidden: true,
+        component: () => import('@/views/excel/select-excel'),
+        name: 'SelectExcel',
+        meta: { title: 'Export Selected' }
+      },
+      {
+        path: 'export-merge-header',
+        hidden: true,
+        component: () => import('@/views/excel/merge-header'),
+        name: 'MergeHeader',
+        meta: { title: 'Merge Header' }
+      },
+      {
+        path: 'upload-excel',
+        component: () => import('@/views/excel/upload-excel'),
+        name: 'UploadExcel',
+        meta: { title: '模型训练' }
+      }
+    ]
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
@@ -79,24 +130,13 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
+        meta: { title: '价值成果', icon: 'dashboard', affix: false }
       }
     ]
   },
   {
     path: '/guide',
+    hidden: true,
     component: Layout,
     redirect: '/guide/index',
     children: [
@@ -132,8 +172,9 @@ export const asyncRoutes = [
   {
     path: '/permission',
     component: Layout,
+    hidden: true,
     redirect: '/permission/page',
-    alwaysShow: true, // will always show the root menu
+    // alwaysShow: true, // will always show the root menu
     name: 'Permission',
     meta: {
       title: 'Permission',
@@ -185,16 +226,17 @@ export const asyncRoutes = [
   },
 
   /** when your routing map is too long, you can split it into small modules **/
-  componentsRouter,
-  chartsRouter,
-  nestedRouter,
-  tableRouter,
+  // componentsRouter,
+  // chartsRouter,
+  // nestedRouter,
+  // tableRouter,
 
   {
     path: '/example',
     component: Layout,
     redirect: '/example/list',
     name: 'Example',
+    hidden: true,
     meta: {
       title: 'Example',
       icon: 'el-icon-s-help'
@@ -225,6 +267,7 @@ export const asyncRoutes = [
   {
     path: '/tab',
     component: Layout,
+    hidden: true,
     children: [
       {
         path: 'index',
@@ -237,6 +280,7 @@ export const asyncRoutes = [
 
   {
     path: '/error',
+    hidden: true,
     component: Layout,
     redirect: 'noRedirect',
     name: 'ErrorPages',
@@ -262,6 +306,7 @@ export const asyncRoutes = [
 
   {
     path: '/error-log',
+    hidden: true,
     component: Layout,
     children: [
       {
@@ -274,47 +319,11 @@ export const asyncRoutes = [
   },
 
   {
-    path: '/excel',
-    component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'Excel',
-    meta: {
-      title: 'Excel',
-      icon: 'excel'
-    },
-    children: [
-      {
-        path: 'export-excel',
-        component: () => import('@/views/excel/export-excel'),
-        name: 'ExportExcel',
-        meta: { title: 'Export Excel' }
-      },
-      {
-        path: 'export-selected-excel',
-        component: () => import('@/views/excel/select-excel'),
-        name: 'SelectExcel',
-        meta: { title: 'Export Selected' }
-      },
-      {
-        path: 'export-merge-header',
-        component: () => import('@/views/excel/merge-header'),
-        name: 'MergeHeader',
-        meta: { title: 'Merge Header' }
-      },
-      {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
-        meta: { title: 'Upload Excel' }
-      }
-    ]
-  },
-
-  {
     path: '/zip',
     component: Layout,
     redirect: '/zip/download',
-    alwaysShow: true,
+    // alwaysShow: true,
+    hidden: true,
     name: 'Zip',
     meta: { title: 'Zip', icon: 'zip' },
     children: [
@@ -330,6 +339,7 @@ export const asyncRoutes = [
   {
     path: '/pdf',
     component: Layout,
+    hidden: true,
     redirect: '/pdf/index',
     children: [
       {
@@ -349,6 +359,7 @@ export const asyncRoutes = [
   {
     path: '/theme',
     component: Layout,
+    hidden: true,
     children: [
       {
         path: 'index',
@@ -362,6 +373,7 @@ export const asyncRoutes = [
   {
     path: '/clipboard',
     component: Layout,
+    hidden: true,
     children: [
       {
         path: 'index',
@@ -374,6 +386,7 @@ export const asyncRoutes = [
 
   {
     path: 'external-link',
+    hidden: true,
     component: Layout,
     children: [
       {
