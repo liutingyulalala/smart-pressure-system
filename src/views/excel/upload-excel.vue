@@ -1,11 +1,30 @@
 <template>
   <div class="app-container">
-    <upload-excel-component :on-success="handleSuccess" :before-upload="beforeUpload" />
+    <div class="header">
+      <upload-excel-component upload-type="sample" upload-button-text="上传数据" class="uploadButton" :on-success="handleSuccess" :before-upload="beforeUpload" @upload-success="handleUploadSuccess" />
+      <el-button class="runButton" :disabled="runButton.disabled" :loading="runButton.loading" type="primary" icon="el-icon-odometer" @click="handleRun">
+        {{ runButton.text }}
+      </el-button>
+      <el-button v-show="websocketEnd" icon="el-icon-view" class="viewReportButton" type="primary" @click="dialogTableVisible = true">
+        查看训练模型报告
+      </el-button>
+    </div>
+    <!-- 进度条 -->
+    <el-progress v-show="processBtnVisible" class="progress" :text-inside="true" :stroke-width="24" :percentage="process" status="success" />
+    <!-- 下载链接、图片文本、进度条 -->
     <el-table v-show="tableDataByPage.length > 0" :data="tableDataByPage" border highlight-current-row style="width: 100%;margin-top:20px;">
       <el-table-column type="index" />
       <el-table-column v-for="item of tableHeader" :key="item" :prop="item" :label="item" />
     </el-table>
-    <Pagination v-show="tableData.length" :total="tableData.length" :page.sync="pageNumber" :limit.sync="pageSize" />
+    <Pagination v-show="tableData.length" :total="tableData.length" :page.sync="pageNumber" :limit.sync="pageSize" class="pagination" />
+    <!-- 弹框 -->
+    <el-dialog title="模型训练报告" fullscreen :visible.sync="dialogTableVisible">
+      <!-- 渲染区域 -->
+      <div class="response-frame">
+        <div class="html-content" v-html="wsData.htmlContents" />
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -18,23 +37,123 @@ export default {
   components: { UploadExcelComponent, Pagination },
   data() {
     return {
+      dialogTableVisible: false,
+      runButton: { // 运行按钮
+        loading: false,
+        disabled: true,
+        text: 'Run'
+      },
       tableData: [],
       tableHeader: [],
       pageSize: 10,
-      pageNumber: 1
+      pageNumber: 1,
+      xlsxFile: null,
+      websocket: null,
+      wsData: { // ws数据
+        rawFile: null,
+        htmlContents: ''
+      },
+      process: 0, // 进度条
+      processBtnVisible: false, // 进度条是否显示
+      websocketEnd: false, // ws是否结束
+      colors: [
+        { color: '#f56c6c', percentage: 20 },
+        { color: '#e6a23c', percentage: 40 },
+        { color: '#5cb87a', percentage: 60 },
+        { color: '#1989fa', percentage: 80 },
+        { color: '#6f7ad3', percentage: 100 }
+      ]
     }
   },
   computed: {
     // 分页表格数据
     tableDataByPage() {
-      console.log(this.pageNumber, 'pageNumber')
       if (!this.tableData.length) return []
       const res = this.tableData.slice((this.pageNumber - 1) * this.pageSize, this.pageSize * this.pageNumber)
-      console.log(res, 'res')
       return res
     }
   },
   methods: {
+    handleUploadSuccess(rawFile) {
+      this.wsData.rawFile = rawFile
+      this.runButton.disabled = false // 当上传文件后，运行按钮才可以点击
+    },
+    handleImageData(blob) {
+      // 将 Blob 直接用作图像数据
+      const imageUrl = URL.createObjectURL(blob)
+      this.wsData.htmlContents += `<img src="${imageUrl}"/>`
+    },
+    async handleRun() {
+      if (!this.wsData.rawFile) {
+        this.$message.info('请上传数据')
+        return
+      }
+      this.runButton.text = 'Running'
+      this.runButton.loading = true
+      this.runButton.disabled = true
+      // WebSocket 连接到后端服务
+      this.websocket = new WebSocket(`ws://10.2.183.14:18800/ws/train`)
+
+      this.websocket.onopen = () => {
+        console.log('WebSocket 连接成功')
+        this.processBtnVisible = true
+      }
+
+      this.websocket.onmessage = (event) => {
+        console.log(event, '发送消息======')
+        const logText = event.data
+        if (event.data instanceof Blob) {
+          // 处理图片数据
+          this.handleImageData(event.data)
+          return
+        } else if (logText.endsWith('Task completed.')) {
+          // 判断是否任务完成，如果是则断开 WebSocket 连接
+          this.websocket.close()
+        } else {
+          const logText_ = JSON.parse(logText)[0].split(': ')
+          const messageTitle = logText_[0]
+          const messageCon = logText_[1]
+          if (messageTitle.includes('当前进度')) {
+          // 正则表达式匹配百分比数字
+            this.process = +(messageCon.split('%')[0])
+            console.log(this.process, '进度==========')
+          } else if (messageTitle.includes('add_heading')) { // 标题
+            this.wsData.htmlContents += `<h1>${messageCon}</h1>`
+          } else if (messageTitle.includes('add_paragraph')) { // 段落
+            this.wsData.htmlContents += `<p>${messageCon}</p>`
+          }
+        }
+        // 假设最后一个消息是下载链接
+        if (logText.startsWith('Download link: ')) {
+          this.xlsxFile = logText.replace('Download link: ', '')
+        }
+      }
+
+      this.websocket.onclose = () => {
+        console.log('WebSocket 连接已关闭')
+        this.websocketEnd = true
+        this.runButton.text = 'Run'
+        this.runButton.loading = false
+        this.runButton.disabled = false
+        this.processBtnVisible = false
+        this.wsData.rawFile = null
+      }
+
+      // 上传文件到 FastAPI 服务器
+      const formData = new FormData()
+      formData.append('upload_file', this.wsData.rawFile)
+
+      const response = await fetch(`http://10.2.183.14:18800/upload/train`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        this.runButton.text = 'Run'
+        this.runButton.disabled = false
+        return
+      }
+    },
     beforeUpload(file) {
       const isLt1M = file.size / 1024 / 1024 < 1
 
@@ -56,3 +175,23 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+   .header {
+    display: flex;
+    align-items: center;
+    .uploadButton {
+      margin-right: 15px;
+    }
+  }
+  .pagination {
+    float: right;
+  }
+  .progress {
+    margin-bottom: 15px;
+  }
+  .response-frame {
+    img {
+      width: 100%;
+    }
+  }
+</style>

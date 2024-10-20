@@ -1,12 +1,15 @@
 <template>
   <div>
     <input ref="excel-upload-input" class="excel-upload-input" type="file" accept=".xlsx, .xls" @change="handleClick">
-    <div class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
+    <div v-if="uploadType==='complex'" class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
       Drop excel file here or
       <el-button :loading="loading" style="margin-left:16px;" size="mini" type="primary" @click="handleUpload">
-        Browse
+        {{ uploadButtonText }}
       </el-button>
     </div>
+    <el-button v-else :loading="loading" style="margin-left:16px;" type="primary" icon="el-icon-receiving" @click="handleUpload">
+      {{ uploadButtonText }}
+    </el-button>
   </div>
 </template>
 
@@ -15,6 +18,17 @@ import XLSX from 'xlsx'
 
 export default {
   props: {
+    /**
+     * complex sample
+     */
+    uploadType: {
+      type: String,
+      default: 'complex'
+    },
+    uploadButtonText: {
+      type: String,
+      default: 'Browse'
+    },
     beforeUpload: Function, // eslint-disable-line
     onSuccess: Function// eslint-disable-line
   },
@@ -66,7 +80,8 @@ export default {
       if (!rawFile) return
       this.upload(rawFile)
     },
-    upload(rawFile) {
+    async upload(rawFile) {
+      console.log(rawFile, 'RawFile')
       this.$refs['excel-upload-input'].value = null // fix can't select the same excel
 
       if (!this.beforeUpload) {
@@ -77,6 +92,7 @@ export default {
       if (before) {
         this.readerData(rawFile)
       }
+      this.$emit('upload-success', rawFile)
     },
     readerData(rawFile) {
       this.loading = true
