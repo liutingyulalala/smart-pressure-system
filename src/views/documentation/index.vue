@@ -1,57 +1,116 @@
 <template>
-  <div class="app-container documentation-container">
-    <a class="document-btn" target="_blank" href="https://store.akveo.com/products/vue-java-admin-dashboard-spring?utm_campaign=akveo_store-Vue-Vue_demo%2Fgithub&utm_source=vue_admin&utm_medium=referral&utm_content=demo_English_button">Java backend integration</a>
-    <a class="document-btn" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/">Documentation</a>
-    <a class="document-btn" target="_blank" href="https://github.com/PanJiaChen/vue-element-admin/">Github Repository</a>
-    <a class="document-btn" target="_blank" href="https://panjiachen.gitee.io/vue-element-admin-site/zh/">国内文档</a>
-    <dropdown-menu class="document-btn" :items="articleList" title="系列文章" />
-    <a class="document-btn" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/zh/job/">内推招聘</a>
+  <div class="doc-wrapper">
+    <el-alert
+      title="提示"
+      type="info"
+      description="推理完成2秒后将跳转到价值成果页面"
+      show-icon
+    />
+    <el-form
+      ref="form"
+      :model="form"
+      label-width="150px"
+      class="form-container"
+    >
+      <el-form-item label="模型类型">
+        <el-radio-group v-model="form.model_cate">
+          <el-radio label="cpu">cpu核数</el-radio>
+          <el-radio label="throughput">吞吐量</el-radio>
+          <el-radio label="mem">内存大小</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="模型压力">
+        <el-input v-model="form.threads_data_Threads" />
+      </el-form-item>
+      <el-form-item label="cpu利用率">
+        <el-input v-model="form.server_cpu_ratio" />
+      </el-form-item>
+      <el-form-item label="内存利用率">
+        <el-input v-model="form.server_mem_ratio" />
+      </el-form-item>
+      <el-form-item label="平均响应时间">
+        <el-input v-model="form.resp_time_avg_all" />
+      </el-form-item>
+      <el-form-item label="内存大小">
+        <el-input v-model="form.pod_memory" />
+      </el-form-item>
+      <el-form-item label="服务的吞吐量">
+        <el-input v-model="form.throughput_req" />
+      </el-form-item>
+      <el-form-item label="历史配置">
+        <el-input v-model="form.pre_alloc" />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleSubmit">即刻开始推理</el-button>
+        <el-button @click="handleReset">重置</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
 <script>
-import DropdownMenu from '@/components/Share/DropdownMenu'
-
+import request from '@/utils/request'
 export default {
   name: 'Documentation',
-  components: { DropdownMenu },
+  components: {},
   data() {
     return {
-      articleList: [
-        { title: '基础篇', href: 'https://juejin.im/post/59097cd7a22b9d0065fb61d2' },
-        { title: '登录权限篇', href: 'https://juejin.im/post/591aa14f570c35006961acac' },
-        { title: '实战篇', href: 'https://juejin.im/post/593121aa0ce4630057f70d35' },
-        { title: 'vue-admin-template 篇', href: 'https://juejin.im/post/595b4d776fb9a06bbe7dba56' },
-        { title: 'v4.0 篇', href: 'https://juejin.im/post/5c92ff94f265da6128275a85' },
-        { title: '自行封装 component', href: 'https://segmentfault.com/a/1190000009090836' },
-        { title: '优雅的使用 icon', href: 'https://juejin.im/post/59bb864b5188257e7a427c09' },
-        { title: 'webpack4（上）', href: 'https://juejin.im/post/59bb864b5188257e7a427c09' },
-        { title: 'webpack4（下）', href: 'https://juejin.im/post/5b5d6d6f6fb9a04fea58aabc' }
-      ]
+      form: {
+        model_cate: 'cpu',
+        threads_data_Threads: 12.5,
+        server_cpu_ratio: 0.8,
+        resp_time_avg_all: 33.8,
+        server_mem_ratio: 0.6,
+        pod_memory: 8.0,
+        throughput_req: 100.0,
+        pre_alloc: 3
+      }
+    }
+  },
+  methods: {
+    async handleSubmit() {
+      console.log(this.form)
+
+      // const response = fetch('/dev-api/da/infer/', {
+      //   method: 'POST', // 指定请求方法
+      //   headers: {
+      //     'Content-Type': 'application/json' // 设置请求的Content-Type
+      //   },
+      //   body: JSON.stringify(this.form) // 将数据转换为JSON字符串作为请求体
+      // })
+      const response = await request({
+        url: '/da/infer/',
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json' // 设置请求的Content-Type
+        },
+        data: this.form
+      })
+      // const response = { 'pred_value': 222, 'diff_value': 268, 'pre_alloc': 490, 'unit_price': 3000 }
+      console.log(response, '推理结果')
+    },
+    handleReset() {
+      this.form = {
+        model_cate: '',
+        threads_data_Threads: 12.5,
+        server_cpu_ratio: 0.8,
+        resp_time_avg_all: 33.8,
+        server_mem_ratio: 0.6,
+        pod_memory: 8.0,
+        throughput_req: 100.0,
+        pre_alloc: 3
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.documentation-container {
-  margin: 50px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-
-  .document-btn {
-    flex-shrink: 0;
-    display: block;
-    cursor: pointer;
-    background: black;
-    color: white;
-    height: 60px;
-    padding: 0 16px;
-    margin: 16px;
-    line-height: 60px;
-    font-size: 20px;
-    text-align: center;
+.form-container {
+  width: 40%;
+  margin: 25px auto;
+  ::v-deep .el-form-item__label {
+    font-weight: normal;
   }
 }
 </style>

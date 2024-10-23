@@ -104,7 +104,9 @@ export default {
           const firstSheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[firstSheetName]
           const header = this.getHeaderRow(worksheet)
-          const results = XLSX.utils.sheet_to_json(worksheet)
+          console.log(worksheet, 'worksheet')
+          // 无法将日期转化成字符串 再看下文档 ===待办
+          const results = XLSX.utils.sheet_to_json(worksheet, { raw: true })
           this.generateData({ header, results })
           this.loading = false
           resolve()

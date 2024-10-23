@@ -83,15 +83,21 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/excel',
+    path: '/',
     component: Layout,
-    redirect: '/excel/upload-excel',
+    redirect: '/upload-excel',
     name: 'Excel',
     meta: {
       // title: 'Excel',
       icon: 'excel'
     },
     children: [
+      {
+        path: 'upload-excel',
+        component: () => import('@/views/excel/upload-excel'),
+        name: 'UploadExcel',
+        meta: { title: '模型训练' }
+      },
       {
         path: 'export-excel',
         hidden: true,
@@ -112,22 +118,15 @@ export const constantRoutes = [
         component: () => import('@/views/excel/merge-header'),
         name: 'MergeHeader',
         meta: { title: 'Merge Header' }
-      },
-      {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
-        meta: { title: '模型训练' }
       }
     ]
   },
   {
-    path: '/',
+    path: '/dashboard',
     component: Layout,
-    redirect: '/dashboard',
     children: [
       {
-        path: 'dashboard',
+        path: 'index',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
         meta: { title: '价值成果', icon: 'dashboard', affix: false }

@@ -11,10 +11,18 @@
     </div>
     <!-- 进度条 -->
     <el-progress v-show="processBtnVisible" class="progress" :text-inside="true" :stroke-width="24" :percentage="process" status="success" />
-    <!-- 下载链接、图片文本、进度条 -->
+    <div v-show="!tableDataByPage.length" class="notData">
+      <img src="@/assets/noData.png" alt="">
+      <div class="tips"><span>请先上传训练集数据</span></div>
+    </div>
+    <!-- 下载链接、图片文本、进度条 ===待办 -->
     <el-table v-show="tableDataByPage.length > 0" :data="tableDataByPage" border highlight-current-row style="width: 100%;margin-top:20px;">
       <el-table-column type="index" />
-      <el-table-column v-for="item of tableHeader" :key="item" :prop="item" :label="item" />
+      <el-table-column v-for="item of tableHeader" :key="item" :prop="item" :label="dataLabelMap[item]">
+        <template slot-scope="props">
+          {{ props.column.property === 'Time' ? new Date(props.row.Time).toLocaleString() : props.row[props.column.property].toFixed(2) }}
+        </template>
+      </el-table-column>
     </el-table>
     <Pagination v-show="tableData.length" :total="tableData.length" :page.sync="pageNumber" :limit.sync="pageSize" class="pagination" />
     <!-- 弹框 -->
@@ -24,7 +32,6 @@
         <div class="html-content" v-html="wsData.htmlContents" />
       </div>
     </el-dialog>
-
   </div>
 </template>
 
@@ -37,6 +44,16 @@ export default {
   components: { UploadExcelComponent, Pagination },
   data() {
     return {
+      dataLabelMap: {
+        Time: '时间',
+        threads_data_Threads: '模型压力',
+        server_cpu_ratio: 'cpu利用率',
+        server_mem_ratio: '内存利用率',
+        resp_time_avg_all: '平均响应时间',
+        pod_cores: 'cpu的核数',
+        pod_memory: '内存大小',
+        throughput_req: '服务的吞吐量'
+      },
       dialogTableVisible: false,
       runButton: { // 运行按钮
         loading: false,
@@ -118,7 +135,7 @@ export default {
             this.process = +(messageCon.split('%')[0])
             console.log(this.process, '进度==========')
           } else if (messageTitle.includes('add_heading')) { // 标题
-            this.wsData.htmlContents += `<h1>${messageCon}</h1>`
+            this.wsData.htmlContents += `<h2>${messageCon}</h2>`
           } else if (messageTitle.includes('add_paragraph')) { // 段落
             this.wsData.htmlContents += `<p>${messageCon}</p>`
           }
@@ -168,7 +185,7 @@ export default {
       return false
     },
     handleSuccess({ results, header }) {
-      console.log(results)
+      console.log(header)
       this.tableData = results
       this.tableHeader = header
     }
@@ -181,6 +198,17 @@ export default {
     align-items: center;
     .uploadButton {
       margin-right: 15px;
+    }
+  }
+  .notData {
+    text-align: center;
+    padding: 50px;
+    div {
+      color: #b2adad;
+      font-size: 22px;
+      span {
+        margin-left: 20px;
+      }
     }
   }
   .pagination {
@@ -201,7 +229,9 @@ export default {
     color: #2c3e50;
     -webkit-font-smoothing: antialiased;
     ::v-deep img {
-      width: 100%;
+      width: 45%;
+      margin: 0 auto;
+      display: block;
     }
   }
 </style>
