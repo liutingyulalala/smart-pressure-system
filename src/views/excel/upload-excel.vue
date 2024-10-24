@@ -50,9 +50,9 @@ export default {
         server_cpu_ratio: 'cpu利用率',
         server_mem_ratio: '内存利用率',
         resp_time_avg_all: '平均响应时间',
-        pod_cores: 'cpu的核数',
+        pod_cores: 'cpu核数',
         pod_memory: '内存大小',
-        throughput_req: '服务的吞吐量'
+        throughput_req: '服务吞吐量'
       },
       dialogTableVisible: false,
       runButton: { // 运行按钮
