@@ -1,8 +1,15 @@
 <template>
   <div class="app-container">
+    <div class="steps">
+      <el-steps :active="active" simple style="margin-bottom: 20px">
+        <el-step title="上传训练集数据" icon="el-icon-upload" />
+        <el-step title="开始训练模型" icon="el-icon-cpu" />
+        <el-step title="生成分析报告" icon="el-icon-data-line" />
+      </el-steps>
+    </div>
     <div class="header">
       <upload-excel-component upload-type="sample" upload-button-text="上传数据" class="uploadButton" :on-success="handleSuccess" :before-upload="beforeUpload" @upload-success="handleUploadSuccess" />
-      <el-button class="runButton" :disabled="runButton.disabled" :loading="runButton.loading" type="primary" icon="el-icon-odometer" @click="handleRun">
+      <el-button class="runButton" :disabled="runButton.disabled" :loading="runButton.loading" type="primary" icon="el-icon-cpu" @click="handleRun">
         {{ runButton.text }}
       </el-button>
       <el-button v-show="websocketEnd" icon="el-icon-view" class="viewReportButton" type="primary" @click="dialogTableVisible = true">
@@ -12,8 +19,7 @@
     <!-- 进度条 -->
     <el-progress v-show="processBtnVisible" class="progress" :text-inside="true" :stroke-width="24" :percentage="process" status="success" />
     <div v-show="!tableDataByPage.length" class="notData">
-      <img src="@/assets/noData.png" alt="">
-      <div class="tips"><span>请先上传训练集数据</span></div>
+      <i class="iconfont icon-emptypage" style="font-size: 150px;" />
     </div>
     <!-- 下载链接、图片文本、进度条 ===待办 -->
     <el-table v-show="tableDataByPage.length > 0" :data="tableDataByPage" border highlight-current-row style="width: 100%;margin-top:20px;">
@@ -44,6 +50,7 @@ export default {
   components: { UploadExcelComponent, Pagination },
   data() {
     return {
+      active: 1,
       dataLabelMap: {
         Time: '时间',
         threads_data_Threads: '模型压力',
@@ -105,6 +112,7 @@ export default {
         this.$message.info('请上传数据')
         return
       }
+      this.active = 2
       this.runButton.text = 'Running'
       this.runButton.loading = true
       this.runButton.disabled = true
@@ -149,6 +157,7 @@ export default {
       this.websocket.onclose = () => {
         console.log('WebSocket 连接已关闭')
         this.websocketEnd = true
+        this.active = 3
         this.runButton.text = 'Run'
         this.runButton.loading = false
         this.runButton.disabled = false

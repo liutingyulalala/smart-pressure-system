@@ -7,7 +7,7 @@
         {{ uploadButtonText }}
       </el-button>
     </div>
-    <el-button v-else :loading="loading" style="margin-left:16px;" type="primary" icon="el-icon-receiving" @click="handleUpload">
+    <el-button v-else :loading="loading" style="margin-left:16px;" type="primary" icon="el-icon-upload" @click="handleUpload">
       {{ uploadButtonText }}
     </el-button>
   </div>

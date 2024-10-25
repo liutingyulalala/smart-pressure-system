@@ -2,7 +2,9 @@
   <div class="dashboard-editor-container">
     <panel-group />
     <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-      <line-chart />
+      <el-col :span="24">
+        <line-chart />
+      </el-col>
     </el-row>
 
   </div>

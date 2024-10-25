@@ -30,27 +30,27 @@
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel">
-        <div class="card-panel-icon-wrapper icon-shopping" style="padding: 0px 3px;">
-          <i class="iconfont icon-yu card-panel-icon" style="font-size: 75px;" />
+        <div class="card-panel-icon-wrapper icon-shopping" style="padding: 8px 14px;">
+          <i class="iconfont icon-yu card-panel-icon" style="font-size: 55px;" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
             预测值
           </div>
-          <count-to :start-val="0" :end-val="reasoningResult.pred_value || 0" :duration="2600" class="card-panel-num" />
+          <span class="card-panel-num">{{ reasoningResult.pred_value || 0 }}</span>
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="message" class-name="card-panel-icon" />
+          <svg-icon icon-class="dashboard" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            最初值
+            当前值
           </div>
-          <count-to :start-val="0" :end-val="reasoningResult.pre_alloc || 0" :duration="3000" class="card-panel-num" />
+          <span class="card-panel-num">{{ reasoningResult.pre_alloc || 0 }}</span>
         </div>
       </div>
     </el-col>
@@ -118,7 +118,7 @@ export default {
       }
 
       .icon-shopping {
-        background: #82848a;
+        background: #5b7ee7;
       }
     }
 
@@ -135,7 +135,7 @@ export default {
     }
 
     .icon-shopping {
-      color: #82848a;
+      color: #5b7ee7;
     }
 
     .card-panel-icon-wrapper {

@@ -40,8 +40,8 @@ export default {
     chartData() {
       const { pre_alloc, pred_value } = this.reasoningResult
       return {
-        expectedData: [pred_value],
-        actualData: [pre_alloc]
+        expectedData: [20, 30, 40, 50], // [pred_value],
+        actualData: [pre_alloc, pred_value]
       }
     }
   },
@@ -73,10 +73,15 @@ export default {
     setOptions({ expectedData, actualData } = {}) {
       this.chart.setOption({
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          boundaryGap: false,
+          data: ['当前值', '预测值'],
+          boundaryGap: true,
           axisTick: {
             show: false
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#333'
+            }
           }
         },
         grid: {
@@ -96,47 +101,43 @@ export default {
         yAxis: {
           axisTick: {
             show: false
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#333'
+            }
           }
         },
         legend: {
-          data: ['expected', 'actual']
+          data: ['配置参数']
         },
-        series: [{
-          name: 'expected', itemStyle: {
-            normal: {
-              color: '#FF005A',
-              lineStyle: {
-                color: '#FF005A',
-                width: 2
-              }
-            }
-          },
-          smooth: true,
-          type: 'line',
-          data: expectedData,
-          animationDuration: 2800,
-          animationEasing: 'cubicInOut'
-        },
-        {
-          name: 'actual',
-          smooth: true,
-          type: 'line',
-          itemStyle: {
-            normal: {
-              color: '#3888fa',
-              lineStyle: {
-                color: '#3888fa',
-                width: 2
-              },
-              areaStyle: {
-                color: '#f3f8ff'
-              }
-            }
-          },
-          data: actualData,
-          animationDuration: 2800,
-          animationEasing: 'quadraticOut'
-        }]
+        series: [
+          {
+            name: '配置参数',
+            smooth: true,
+            barWidth: 80, // 柱状体的宽度
+            type: 'bar',
+            label: {
+              show: true,
+              position: 'top'
+            },
+            itemStyle: {
+              color: ({ seriesIndex, dataIndex, data, value }) => { return dataIndex === 0 ? '#e6a700' : 'rgb(84, 112, 198)' }
+              // normal: {
+              //   color: '#ddd',
+              //   lineStyle: {
+              //     color: '#3888fa',
+              //     width: 2
+              //   },
+              //   areaStyle: {
+              //     // color: 'rgb(84, 112, 198)'
+              //   }
+              // }
+            },
+            data: actualData,
+            animationDuration: 2800,
+            animationEasing: 'quadraticOut'
+          }]
       })
     }
   }
