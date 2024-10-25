@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
@@ -25,15 +26,23 @@ export default {
     autoResize: {
       type: Boolean,
       default: true
-    },
-    chartData: {
-      type: Object,
-      required: true
     }
   },
   data() {
     return {
       chart: null
+    }
+  },
+  computed: {
+    ...mapState({
+      reasoningResult: state => state.app.reasoningResult
+    }),
+    chartData() {
+      const { pre_alloc, pred_value } = this.reasoningResult
+      return {
+        expectedData: [pred_value],
+        actualData: [pre_alloc]
+      }
     }
   },
   watch: {

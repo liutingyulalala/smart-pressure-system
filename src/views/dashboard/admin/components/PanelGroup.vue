@@ -1,54 +1,56 @@
 <template>
   <el-row :gutter="40" class="panel-group">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+      <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-people">
-          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
+          <i v-if="isThroughput" class="iconfont icon-a-baochitaiduobiaoqingxiaolian card-panel-icon" />
+          <i v-else-if="reasoningResult.diff_value > 0" class="iconfont icon-a-gaoxinghaoxinqingbiaoqingxihuanbiaoqingxiaolian card-panel-icon" />
+          <i v-else class="iconfont icon-a-dakubeishangshangxinbiaoqingxiaolian card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            New Visits
+            {{ isThroughput ? '--' : reasoningResult.diff_value > 0 ? '增益' : '耗损' }}
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="reasoningResult.diff_value || 0" :duration="3600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('messages')">
-        <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="message" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">
-            Messages
-          </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
-        </div>
-      </div>
-    </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('purchases')">
+      <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-money">
           <svg-icon icon-class="money" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Purchases
+            单价
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="reasoningResult.unit_price || 0" :duration="3200" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
-        <div class="card-panel-icon-wrapper icon-shopping">
-          <svg-icon icon-class="shopping" class-name="card-panel-icon" />
+      <div class="card-panel">
+        <div class="card-panel-icon-wrapper icon-shopping" style="padding: 0px 3px;">
+          <i class="iconfont icon-yu card-panel-icon" style="font-size: 75px;" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Shoppings
+            预测值
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="reasoningResult.pred_value || 0" :duration="2600" class="card-panel-num" />
+        </div>
+      </div>
+    </el-col>
+    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <div class="card-panel">
+        <div class="card-panel-icon-wrapper icon-message">
+          <svg-icon icon-class="message" class-name="card-panel-icon" />
+        </div>
+        <div class="card-panel-description">
+          <div class="card-panel-text">
+            最初值
+          </div>
+          <count-to :start-val="0" :end-val="reasoningResult.pre_alloc || 0" :duration="3000" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -57,10 +59,19 @@
 
 <script>
 import CountTo from 'vue-count-to'
+import { mapState } from 'vuex'
 
 export default {
   components: {
     CountTo
+  },
+  computed: {
+    ...mapState({
+      reasoningResult: state => state.app.reasoningResult
+    }),
+    isThroughput() {
+      return this.reasoningResult.modelCate === 'throughput'
+    }
   },
   methods: {
     handleSetLineChartData(type) {
@@ -95,7 +106,7 @@ export default {
       }
 
       .icon-people {
-        background: #40c9c6;
+        background: #ffba00;
       }
 
       .icon-message {
@@ -107,12 +118,12 @@ export default {
       }
 
       .icon-shopping {
-        background: #34bfa3
+        background: #82848a;
       }
     }
 
     .icon-people {
-      color: #40c9c6;
+      color: #ffba00;
     }
 
     .icon-message {
@@ -124,7 +135,7 @@ export default {
     }
 
     .icon-shopping {
-      color: #34bfa3
+      color: #82848a;
     }
 
     .card-panel-icon-wrapper {

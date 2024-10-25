@@ -6,10 +6,15 @@ const state = {
     withoutAnimation: false
   },
   device: 'desktop',
-  size: Cookies.get('size') || 'medium'
+  size: Cookies.get('size') || 'medium',
+  reasoningResult: {} // 推理结果
 }
 
 const mutations = {
+  // 更新推理结果
+  updateReasoningResult: (state, data) => {
+    state.reasoningResult = data
+  },
   TOGGLE_SIDEBAR: state => {
     state.sidebar.opened = !state.sidebar.opened
     state.sidebar.withoutAnimation = false

@@ -1,6 +1,16 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
+    <el-row class="content">
+      <el-col :span="12">
+        <h1 class="title">Smart Pressure Test</h1>
+        <p class="intro">智能压测系统是一款集模型训练、即时推理、价值展示为一体的产品。</p>
+        <div class="buttons">
+          <el-button type="primary" @click="handleLogin">了解更多</el-button>
+        </div>
+      </el-col>
+      <el-col :span="12"><img width="520" src="https://quick.bootmb.com/assets/img/svg/illustrations/illustration-3.svg"></el-col>
+    </el-row>
+    <el-form v-if="false" ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
         <h3 class="title">智能压测系统</h3>
@@ -153,22 +163,22 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
+    //  this.$refs.loginForm.validate(valid => {
+      //  if (valid) {
+      //   this.loading = true
+      this.$store.dispatch('user/login', this.loginForm)
+        .then(() => {
+          this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+      // } else {
+      //     console.log('error submit!!')
+      //     return false
+      //   }
+      // })
     },
     getOtherQuery(query) {
       return Object.keys(query).reduce((acc, cur) => {
@@ -216,6 +226,30 @@ $cursor: #fff;
 
 /* reset element-ui css */
 .login-container {
+  position: relative;
+
+  .content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    transform: translate(-50%, -50%);
+  }
+  .title {
+    font-family: "Nunito Sans", sans-serif;
+    font-size: 48px;
+    margin-bottom: 15px;
+    margin-top: 150px;
+  }
+  .intro {
+    color: #718096;
+    font-weight: 300;
+    margin-bottom: 50px;
+  }
+  .buttons .el-button {
+    padding: 15px 50px;
+    font-size: 16px;
+  }
   .el-input {
     display: inline-block;
     height: 47px;
@@ -248,7 +282,7 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
+$bg:#fff;
 $dark_gray:#889aa4;
 $light_gray:#eee;
 

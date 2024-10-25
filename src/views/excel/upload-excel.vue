@@ -203,9 +203,12 @@ export default {
   .notData {
     text-align: center;
     padding: 50px;
+    img {
+      width: 250px;
+    }
     div {
       color: #b2adad;
-      font-size: 22px;
+      font-size: 16px;
       span {
         margin-left: 20px;
       }
