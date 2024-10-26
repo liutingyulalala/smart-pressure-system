@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="steps">
       <el-steps :active="active" simple style="margin-bottom: 20px">
-        <el-step title="上传训练集数据" icon="el-icon-upload" />
+        <el-step title="上传样本数据" icon="el-icon-upload" />
         <el-step title="开始训练模型" icon="el-icon-cpu" />
         <el-step title="生成分析报告" icon="el-icon-data-line" />
       </el-steps>
@@ -117,7 +117,7 @@ export default {
       this.runButton.loading = true
       this.runButton.disabled = true
       // WebSocket 连接到后端服务
-      this.websocket = new WebSocket(`ws://10.2.183.14:18800/ws/train`)
+      this.websocket = new WebSocket(`ws://10.0.79.103:18810/ws/train`)
 
       this.websocket.onopen = () => {
         console.log('WebSocket 连接成功')
@@ -131,7 +131,7 @@ export default {
           // 处理图片数据
           this.handleImageData(event.data)
           return
-        } else if (logText.endsWith('Task completed.')) {
+        } else if (logText.endsWith('完成部署')) {
           // 判断是否任务完成，如果是则断开 WebSocket 连接
           this.websocket.close()
         } else {
@@ -169,7 +169,7 @@ export default {
       const formData = new FormData()
       formData.append('upload_file', this.wsData.rawFile)
 
-      const response = await fetch(`http://10.2.183.14:18800/upload/train`, {
+      const response = await fetch(`http://10.0.79.103:18810/upload/train`, {
         method: 'POST',
         body: formData
       })

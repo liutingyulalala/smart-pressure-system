@@ -3,8 +3,7 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-people">
-          <i v-if="isThroughput" class="iconfont icon-a-baochitaiduobiaoqingxiaolian card-panel-icon" />
-          <i v-else-if="reasoningResult.diff_value > 0" class="iconfont icon-a-gaoxinghaoxinqingbiaoqingxihuanbiaoqingxiaolian card-panel-icon" />
+          <i v-if="reasoningResult.diff_value > 0" class="iconfont icon-a-gaoxinghaoxinqingbiaoqingxihuanbiaoqingxiaolian card-panel-icon" />
           <i v-else class="iconfont icon-a-dakubeishangshangxinbiaoqingxiaolian card-panel-icon" />
         </div>
         <div class="card-panel-description">
@@ -12,6 +11,7 @@
             {{ isThroughput ? '--' : reasoningResult.diff_value > 0 ? '增益' : '耗损' }}
           </div>
           <count-to :start-val="0" :end-val="reasoningResult.diff_value || 0" :duration="3600" class="card-panel-num" />
+          <span>元 / 年</span>
         </div>
       </div>
     </el-col>
@@ -24,7 +24,16 @@
           <div class="card-panel-text">
             单价
           </div>
-          <count-to :start-val="0" :end-val="reasoningResult.unit_price || 0" :duration="3200" class="card-panel-num" />
+          <div class="card-panel-counts">
+            <div class="card-panel-counts__items">
+              <count-to :start-val="0" :end-val="reasoningResult.unit_price.cpu || 0" :duration="3200" class="card-panel-num" />
+              <span class="card-panel-counts__label">/ C</span>
+            </div>
+            <div class="card-panel-counts__items">
+              <count-to :start-val="0" :end-val="reasoningResult.unit_price.mem || 0" :duration="3200" class="card-panel-num" />
+              <span class="card-panel-counts__label">/ G</span>
+            </div>
+          </div>
         </div>
       </div>
     </el-col>
@@ -37,7 +46,16 @@
           <div class="card-panel-text">
             预测值
           </div>
-          <span class="card-panel-num">{{ reasoningResult.pred_value || 0 }}</span>
+          <div class="card-panel-counts">
+            <div class="card-panel-counts__items">
+              <span class="card-panel-num">{{ reasoningResult.pred_value.pod_cores || 0 }}</span>
+              <span class="card-panel-counts__label"> C</span>
+            </div>
+            <div class="card-panel-counts__items">
+              <span class="card-panel-num">{{ reasoningResult.pred_value.pod_memory || 0 }}</span>
+              <span class="card-panel-counts__label"> G</span>
+            </div>
+          </div>
         </div>
       </div>
     </el-col>
@@ -50,7 +68,16 @@
           <div class="card-panel-text">
             当前值
           </div>
-          <span class="card-panel-num">{{ reasoningResult.pre_alloc || 0 }}</span>
+          <div class="card-panel-counts">
+            <div class="card-panel-counts__items">
+              <span class="card-panel-num">{{ reasoningResult.pre_alloc.pod_cores || 0 }}</span>
+              <span class="card-panel-counts__label"> C</span>
+            </div>
+            <div class="card-panel-counts__items">
+              <span class="card-panel-num">{{ reasoningResult.pre_alloc.pod_memory || 0 }}</span>
+              <span class="card-panel-counts__label"> G</span>
+            </div>
+          </div>
         </div>
       </div>
     </el-col>
@@ -82,6 +109,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.card-panel-counts {
+  &__items {
+    margin-bottom: 5px;
+  }
+  &__label {
+    color: #d95151;
+  }
+  .card-panel-num {
+    font-size: 14px !important;
+  }
+
+}
 .panel-group {
   margin-top: 18px;
 
@@ -154,7 +193,7 @@ export default {
     .card-panel-description {
       float: right;
       font-weight: bold;
-      margin: 26px;
+      margin: 22px 30px;
       margin-left: 0px;
 
       .card-panel-text {
@@ -167,6 +206,9 @@ export default {
       .card-panel-num {
         font-size: 20px;
       }
+    }
+    .icon-money .card-panel-description .card-panel-text {
+      margin-bottom: 5px;
     }
   }
 }
