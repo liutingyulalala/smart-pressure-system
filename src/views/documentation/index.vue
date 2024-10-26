@@ -73,9 +73,9 @@
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-      <div v-if="throughputResult && throughputResult.pred_value && form.model_cate === 'throughput'" class="throughputResult">
-        <span style="display:inline-block; margin-bottom: 15px;">服务吞吐量：</span><el-tag type="success">{{ throughputResult.pred_value }}</el-tag><br>
-        <span>支撑人数：</span><el-tag type="success">{{ (throughputResult.pred_value * 1500 / 920).toFixed(0) }}人</el-tag>
+      <div v-if="throughputResult && throughputResult.throughput && form.model_cate === 'throughput'" class="throughputResult">
+        <span style="display:inline-block; margin-bottom: 15px;">服务吞吐量：</span><el-tag type="warning">{{ throughputResult.throughput }}</el-tag><br>
+        <span>支撑人数：</span><el-tag type="warning">{{ (throughputResult.throughput * 1500 / 920).toFixed(0) }}人</el-tag>
       </div>
     </div>
   </div>
@@ -145,15 +145,16 @@ export default {
         },
         data: data_
       })
-      console.log(response, 'promiseResults')
       if (data_.model_cate === 'throughput') {
         this.throughputResult = response
+        this.$message.success('推理完成啦ヽ(✿ﾟ▽ﾟ)ノ')
+      } else if (data_.model_cate === 'cpu_mem') {
+        this['app/updateReasoningResult']({ ...response, modelCate: data_.model_cate }) // 缓存推理结果
+        this.$message.success('推理完成啦，2s后跳转到价值展示页面ヽ(✿ﾟ▽ﾟ)ノ')
+        setTimeout(() => {
+          this.$router.push('/dashboard/index')
+        }, 2000)
       }
-      this['app/updateReasoningResult']({ ...response, modelCate: data_.model_cate }) // 缓存推理结果
-      this.$message.success('推理完成啦，2s后跳转到价值展示页面ヽ(✿ﾟ▽ﾟ)ノ')
-      setTimeout(() => {
-        this.$router.push('/dashboard/index')
-      }, 2000)
     },
     handleReset() {
       this.form = {

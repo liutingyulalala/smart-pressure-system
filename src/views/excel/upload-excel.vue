@@ -15,6 +15,7 @@
       <el-button v-show="websocketEnd" icon="el-icon-view" class="viewReportButton" type="primary" @click="dialogTableVisible = true">
         查看训练模型报告
       </el-button>
+      <a v-show="websocketEnd" :href="downloadUrl" download="result.xlsx" style="display: inline-block;margin-left: 500px;color: #606266;margin-top: 12px;"><i class="el-icon-download">报告文档</i></a>
     </div>
     <!-- 进度条 -->
     <el-progress v-show="processBtnVisible" class="progress" :text-inside="true" :stroke-width="24" :percentage="process" status="success" />
@@ -50,6 +51,7 @@ export default {
   components: { UploadExcelComponent, Pagination },
   data() {
     return {
+      downloadUrl: '',
       active: 1,
       dataLabelMap: {
         Time: '时间',
@@ -131,7 +133,9 @@ export default {
           // 处理图片数据
           this.handleImageData(event.data)
           return
-        } else if (logText.endsWith('完成部署')) {
+        } else if (logText.includes('Task completed')) {
+          // return
+        } else if (logText.includes('完成部署')) {
           // 判断是否任务完成，如果是则断开 WebSocket 连接
           this.websocket.close()
         } else {
@@ -146,6 +150,8 @@ export default {
             this.wsData.htmlContents += `<h2>${messageCon}</h2>`
           } else if (messageTitle.includes('add_paragraph')) { // 段落
             this.wsData.htmlContents += `<p>${messageCon}</p>`
+          } else if (messageTitle.includes('报告下载url')) {
+            this.downloadUrl = messageCon
           }
         }
         // 假设最后一个消息是下载链接
